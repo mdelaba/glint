@@ -5,23 +5,11 @@ import os
 import shutil
 import argparse
 
-def main():
-    # --- CONFIGURATION ---
-    DEFAULT_MULTIPLIER = 1.2
-    DEFAULT_OFFSET = 10
-    # ---------------------
-
-    parser = argparse.ArgumentParser(description="Adjust screen brightness based on webcam light levels.")
-    parser.add_argument("-m", "--multiplier", type=float, default=DEFAULT_MULTIPLIER,
-                        help=f"Sensitivity multiplier (default: {DEFAULT_MULTIPLIER})")
-    parser.add_argument("-o", "--offset", type=int, default=DEFAULT_OFFSET,
-                        help=f"Minimum brightness percentage (default: {DEFAULT_OFFSET})")
-    args = parser.parse_args()
-
+def run_glint(multiplier, offset):
     cap = cv2.VideoCapture(0)
     if not cap.isOpened():
         print("Error: Could not open camera.")
-        exit(1)
+        return
 
     # Throw away some frames to allow the camera to adjust to light levels
     for _ in range(10):
@@ -37,12 +25,12 @@ def main():
         # Calculate percentage with Multiplier and Offset
         # Formula: (Raw % * Multiplier) + Offset
         raw_percentage = (avg_brightness / 255) * 100
-        final_percentage = int((raw_percentage * args.multiplier) + args.offset)
+        final_percentage = int((raw_percentage * multiplier) + offset)
 
         # Constrain to 0-100 range
         final_percentage = max(0, min(100, final_percentage))
         
-        print(f"Target Brightness: {final_percentage}% (Multiplier: {args.multiplier}, Offset: {args.offset})")
+        print(f"Target Brightness: {final_percentage}% (Multiplier: {multiplier}, Offset: {offset})")
 
         brightness_set = False
 
@@ -108,6 +96,21 @@ def main():
                 print(f"Failed to set brightness: {e}")
     else:
         print("Error: Failed to capture frame.")
+
+def main():
+    # --- CONFIGURATION ---
+    DEFAULT_MULTIPLIER = 1.2
+    DEFAULT_OFFSET = 10
+    # ---------------------
+
+    parser = argparse.ArgumentParser(description="Adjust screen brightness based on webcam light levels.")
+    parser.add_argument("-m", "--multiplier", type=float, default=DEFAULT_MULTIPLIER,
+                        help=f"Sensitivity multiplier (default: {DEFAULT_MULTIPLIER})")
+    parser.add_argument("-o", "--offset", type=int, default=DEFAULT_OFFSET,
+                        help=f"Minimum brightness percentage (default: {DEFAULT_OFFSET})")
+    args = parser.parse_args()
+
+    run_glint(args.multiplier, args.offset)
 
 if __name__ == "__main__":
     main()

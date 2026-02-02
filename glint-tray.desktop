@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Glint Tray
+Comment=Webcam-based brightness control system tray
+Exec=/usr/bin/glint-tray
+Icon=glint
+Terminal=false
+Categories=Utility;Settings;
