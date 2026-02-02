@@ -5,7 +5,7 @@ import glint
 from PyQt6.QtWidgets import (QApplication, QSystemTrayIcon, QMenu, QWidget, 
                              QVBoxLayout, QLabel, QSlider, QPushButton)
 from PyQt6.QtGui import QIcon
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QSettings
 
 class GlintConfigWindow(QWidget):
     def __init__(self):
@@ -17,31 +17,41 @@ class GlintConfigWindow(QWidget):
         self.icon_path = os.path.join(script_dir, "icon.png")
         self.setWindowIcon(QIcon(self.icon_path))
         
+        self.settings = QSettings("Glint", "GlintTray")
+        
         self.resize(300, 200)
 
         # Layout
         layout = QVBoxLayout()
         
+        # Load saved settings
+        saved_mult = float(self.settings.value("multiplier", 1.2))
+        slider_mult_val = int(saved_mult * 10)
+        
+        saved_offset = int(self.settings.value("offset", 10))
+        
         # Multiplier Slider
-        self.lbl_mult = QLabel("Multiplier: 1.2")
+        self.lbl_mult = QLabel(f"Multiplier: {saved_mult}")
         layout.addWidget(self.lbl_mult)
         
         self.slider_mult = QSlider(Qt.Orientation.Horizontal)
         self.slider_mult.setMinimum(5)   # 0.5
         self.slider_mult.setMaximum(30)  # 3.0
-        self.slider_mult.setValue(12)    # 1.2
+        self.slider_mult.setValue(slider_mult_val)
         self.slider_mult.valueChanged.connect(self.update_mult_label)
+        self.slider_mult.valueChanged.connect(self.save_settings)
         layout.addWidget(self.slider_mult)
         
         # Offset Slider
-        self.lbl_offset = QLabel("Offset: 10%")
+        self.lbl_offset = QLabel(f"Offset: {saved_offset}%")
         layout.addWidget(self.lbl_offset)
         
         self.slider_offset = QSlider(Qt.Orientation.Horizontal)
         self.slider_offset.setMinimum(0)
         self.slider_offset.setMaximum(100)
-        self.slider_offset.setValue(10)
+        self.slider_offset.setValue(saved_offset)
         self.slider_offset.valueChanged.connect(self.update_offset_label)
+        self.slider_offset.valueChanged.connect(self.save_settings)
         layout.addWidget(self.slider_offset)
         
         # Run Button
@@ -50,6 +60,12 @@ class GlintConfigWindow(QWidget):
         layout.addWidget(self.btn_run)
         
         self.setLayout(layout)
+
+    def save_settings(self):
+        mult = self.slider_mult.value() / 10.0
+        offset = self.slider_offset.value()
+        self.settings.setValue("multiplier", mult)
+        self.settings.setValue("offset", offset)
 
     def update_mult_label(self, value):
         self.lbl_mult.setText(f"Multiplier: {value / 10.0}")
