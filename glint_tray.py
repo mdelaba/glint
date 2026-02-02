@@ -13,7 +13,7 @@ class GlintConfigWindow(QWidget):
         self.setWindowTitle("Glint Settings")
         
         # Resolve icon path relative to script
-        script_dir = os.path.dirname(os.path.abspath(__file__))
+        script_dir = os.path.dirname(os.path.realpath(__file__))
         self.icon_path = os.path.join(script_dir, "icon.png")
         self.setWindowIcon(QIcon(self.icon_path))
         
@@ -78,7 +78,7 @@ class GlintTrayApp:
         self.app = QApplication(sys.argv)
         self.app.setQuitOnLastWindowClosed(False)
         
-        script_dir = os.path.dirname(os.path.abspath(__file__))
+        script_dir = os.path.dirname(os.path.realpath(__file__))
         icon_path = os.path.join(script_dir, "icon.png")
         
         self.window = GlintConfigWindow()
