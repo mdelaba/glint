@@ -6,34 +6,37 @@ Glint is a lightweight utility that automatically adjusts your screen brightness
 
 1.  **Capture**: It takes a single frame from the default webcam using OpenCV.
 2.  **Analyze**: It converts the image to grayscale and calculates the average pixel brightness.
-3.  **Adjust**: It calculates a target screen brightness percentage (applying a configurable multiplier and minimum offset) and applies it using the `brightnessctl` system utility.
+3.  **Adjust**: It calculates a target screen brightness percentage (applying a configurable multiplier and minimum offset).
+4.  **Hardware/Software Control**: It first attempts to use `brightnessctl` (hardware control). If no backlight device is found, it falls back to `xrandr` (software dimming), ensuring compatibility with desktop monitors and laptops alike.
 
 ## Prerequisites
 
 *   **Python 3**
-*   **brightnessctl**: A Linux utility for controlling screen brightness.
+*   **OpenCV (python-opencv)**: For image capture and processing.
+*   **brightnessctl**: For hardware-level brightness control.
+*   **xrandr**: For software-level brightness control (fallback).
 *   **Webcam**: A functional video capture device.
 
 ## Installation
 
 ### 1. System Dependencies
 
-First, install `brightnessctl`.
+Install the required utilities.
 
 *   **Debian/Ubuntu:**
     ```bash
-    sudo apt install brightnessctl
+    sudo apt install brightnessctl x11-xserver-utils
     ```
 *   **Arch Linux:**
     ```bash
-    sudo pacman -S brightnessctl
+    sudo pacman -S brightnessctl xorg-xrandr
     ```
 *   **Fedora:**
     ```bash
-    sudo dnf install brightnessctl
+    sudo dnf install brightnessctl xrandr
     ```
 
-*Note: Ensure your user has permission to control brightness (often requires being in the `video` or `input` group, depending on your distro).*
+*Note: Ensure your user has permission to control brightness (often requires being in the `video` group for `brightnessctl`).*
 
 ### 2. Python Dependencies
 
