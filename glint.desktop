@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Glint
+Exec=/usr/bin/glint
+Icon=glint
+Terminal=false
+Categories=Utility;
