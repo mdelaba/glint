@@ -5,22 +5,35 @@ import os
 import shutil
 import argparse
 
+try:
+    from PyQt6.QtCore import QSettings
+    HAS_QT = True
+except ImportError:
+    HAS_QT = False
+
 def run_glint(multiplier, offset):
     cap = cv2.VideoCapture(0)
     if not cap.isOpened():
         print("Error: Could not open camera.")
         return
 
-    # Throw away some frames to allow the camera to adjust to light levels
-    for _ in range(10):
+    # Throw away frames to allow the camera's auto-exposure to stabilize
+    # Increased to 20 frames (approx 0.7s at 30fps)
+    for _ in range(20):
         cap.read()
 
-    ret, frame = cap.read()
+    brightness_samples = []
+    # Capture 10 frames to average out noise/flicker
+    for _ in range(10):
+        ret, frame = cap.read()
+        if ret:
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            brightness_samples.append(gray.mean())
+
     cap.release()
 
-    if ret:
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        avg_brightness = gray.mean()
+    if brightness_samples:
+        avg_brightness = sum(brightness_samples) / len(brightness_samples)
 
         # Calculate percentage with Multiplier and Offset
         # Formula: (Raw % * Multiplier) + Offset
@@ -94,13 +107,38 @@ def run_glint(multiplier, offset):
                         break # Only set the first connected monitor
             except Exception as e:
                 print(f"Failed to set brightness: {e}")
+                
+        return {
+            "raw_brightness": raw_percentage,
+            "target_brightness": final_percentage
+        }
     else:
         print("Error: Failed to capture frame.")
+        return None
 
 def main():
     # --- CONFIGURATION ---
     DEFAULT_MULTIPLIER = 1.2
     DEFAULT_OFFSET = 10
+    
+    if HAS_QT:
+        try:
+            settings = QSettings("Glint", "GlintTray")
+            # QSettings.value returns the stored type or a variant.
+            # We explicitly cast to ensure safety.
+            saved_mult = settings.value("multiplier")
+            saved_offset = settings.value("offset")
+            
+            if saved_mult is not None:
+                DEFAULT_MULTIPLIER = float(saved_mult)
+            
+            if saved_offset is not None:
+                DEFAULT_OFFSET = int(saved_offset)
+            
+            # print(f"Loaded config from QSettings: Mult={DEFAULT_MULTIPLIER}, Offset={DEFAULT_OFFSET}")
+        except Exception as e:
+            print(f"Warning: Could not load QSettings: {e}")
+            
     # ---------------------
 
     parser = argparse.ArgumentParser(description="Adjust screen brightness based on webcam light levels.")

@@ -59,6 +59,11 @@ class GlintConfigWindow(QWidget):
         self.btn_run.clicked.connect(self.run_glint)
         layout.addWidget(self.btn_run)
         
+        # Result Label
+        self.lbl_result = QLabel("")
+        self.lbl_result.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.lbl_result)
+        
         self.setLayout(layout)
 
     def save_settings(self):
@@ -79,12 +84,20 @@ class GlintConfigWindow(QWidget):
         
         self.btn_run.setText("Adjusting...")
         self.btn_run.setEnabled(False)
+        self.lbl_result.setText("Capturing...")
         QApplication.processEvents() # Update UI
         
         try:
-            glint.run_glint(mult, offset)
+            result = glint.run_glint(mult, offset)
+            if result:
+                raw = result.get('raw_brightness', 0)
+                target = result.get('target_brightness', 0)
+                self.lbl_result.setText(f"Detected: {raw:.1f}% -> Target: {target}%")
+            else:
+                 self.lbl_result.setText("Error: Capture failed")
         except Exception as e:
             print(f"Error running glint: {e}")
+            self.lbl_result.setText("Error occurred")
         finally:
             self.btn_run.setText("Adjust Brightness Now")
             self.btn_run.setEnabled(True)
