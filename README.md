@@ -1,20 +1,29 @@
 # Glint
 
-Glint is a lightweight utility that automatically adjusts your screen brightness based on ambient light captured from your webcam. It is designed to be run as a "one-off" command (e.g., triggered by a shortcut or startup script) rather than a background service.
+Glint is a lightweight utility that automatically adjusts your screen brightness based on ambient light captured from your webcam. It bridges the gap for Linux users on desktops or laptops without built-in light sensors, providing a "smart" brightness experience.
+
+## Supported Desktops
+
+Glint is designed to be platform-agnostic but includes native optimizations for:
+*   **KDE Plasma**: Uses PowerDevil D-Bus API.
+*   **Hyprland / Wayland**: Uses `wl-gammarelay-rs` for software-based dimming.
+*   **X11 (GNOME, XFCE, etc.)**: Uses `xrandr` for software-based dimming.
+*   **Generic**: Uses `brightnessctl` for hardware-level backlight control on any desktop.
 
 ## How It Works
 
 1.  **Capture**: It takes a single frame from the default webcam using OpenCV.
 2.  **Analyze**: It converts the image to grayscale and calculates the average pixel brightness.
 3.  **Adjust**: It calculates a target screen brightness percentage (applying a configurable multiplier and minimum offset).
-4.  **Hardware/Software Control**: It first attempts to use `brightnessctl` (hardware control). If no backlight device is found, it falls back to `xrandr` (software dimming), ensuring compatibility with desktop monitors and laptops alike.
+4.  **Hardware/Software Control**: It first attempts to use desktop-specific APIs (KDE via PowerDevil or Hyprland via `wl-gammarelay`). If those are unavailable, it tries `brightnessctl` (hardware control). Finally, it falls back to `xrandr` (software dimming) for X11 environments, ensuring broad compatibility.
 
 ## Prerequisites
 
 *   **Python 3**
 *   **OpenCV (python-opencv)**: For image capture and processing.
-*   **brightnessctl**: For hardware-level brightness control.
-*   **xrandr**: For software-level brightness control (fallback).
+*   **brightnessctl**: For hardware-level brightness control (generic).
+*   **xrandr**: For software-level brightness control on X11 (fallback).
+*   **wl-gammarelay-rs**: Required for Hyprland/Wayland software brightness control.
 *   **Webcam**: A functional video capture device.
 
 ## Installation
@@ -60,6 +69,10 @@ You can adjust the behavior by editing the constants at the top of `glint.py`:
 
 *   **`MULTIPLIER`**: Controls sensitivity. Values `> 1` increase brightness more aggressively in light; `< 1` makes it more conservative.
 *   **`OFFSET`**: The minimum brightness percentage (prevents the screen from going pitch black).
+
+**Recommended for KDE Plasma:**
+*   **`MULTIPLIER`**: `0.6`
+*   **`OFFSET`**: `15%` (0.15)
 
 ## Desktop Integration
 
