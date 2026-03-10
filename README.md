@@ -6,7 +6,7 @@ Glint is a lightweight utility that automatically adjusts your screen brightness
 
 Glint is designed to be platform-agnostic but includes native optimizations for:
 *   **KDE Plasma**: Uses PowerDevil D-Bus API.
-*   **Hyprland / Wayland**: Uses `wl-gammarelay-rs` for software-based dimming.
+*   **Hyprland / Wayland**: Uses `wl-gammarelay-rs` for software-based dimming. *(Note: Hyprland is still being tested but is currently best at 1.8 multiplier, 30 offset)*
 *   **X11 (GNOME, XFCE, etc.)**: Uses `xrandr` for software-based dimming.
 *   **Generic**: Uses `brightnessctl` for hardware-level backlight control on any desktop.
 
@@ -73,6 +73,10 @@ You can adjust the behavior by editing the constants at the top of `glint.py`:
 **Recommended for KDE Plasma:**
 *   **`MULTIPLIER`**: `0.6`
 *   **`OFFSET`**: `15%` (0.15)
+
+**Recommended for Hyprland (Experimental):**
+*   **`MULTIPLIER`**: `1.8`
+*   **`OFFSET`**: `30%` (0.30)
 
 ## Desktop Integration
 
