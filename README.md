@@ -6,7 +6,7 @@ Glint is a lightweight utility that automatically adjusts your screen brightness
 
 Glint is designed to be platform-agnostic but includes native optimizations for:
 *   **KDE Plasma**: Uses PowerDevil D-Bus API.
-*   **Hyprland / Wayland**: Uses `wl-gammarelay-rs` for software-based dimming. *(Note: Hyprland is still being tested but is currently best at 1.8 multiplier, 30 offset)*
+*   **Hyprland / Wayland**: Uses `hyprsunset` for software-based dimming. *(Note: Hyprland is still being tested but is currently best at 1.8 multiplier, 30 offset)*
 *   **X11 (GNOME, XFCE, etc.)**: Uses `xrandr` for software-based dimming.
 *   **Generic**: Uses `brightnessctl` for hardware-level backlight control on any desktop.
 
@@ -15,7 +15,7 @@ Glint is designed to be platform-agnostic but includes native optimizations for:
 1.  **Capture**: It takes a single frame from the default webcam using OpenCV.
 2.  **Analyze**: It converts the image to grayscale and calculates the average pixel brightness.
 3.  **Adjust**: It calculates a target screen brightness percentage (applying a configurable multiplier and minimum offset).
-4.  **Hardware/Software Control**: It first attempts to use desktop-specific APIs (KDE via PowerDevil or Hyprland via `wl-gammarelay`). If those are unavailable, it tries `brightnessctl` (hardware control). Finally, it falls back to `xrandr` (software dimming) for X11 environments, ensuring broad compatibility.
+4.  **Hardware/Software Control**: It first attempts to use desktop-specific APIs (KDE via PowerDevil or Hyprland via `hyprsunset`). If those are unavailable, it tries `brightnessctl` (hardware control). Finally, it falls back to `xrandr` (software dimming) for X11 environments, ensuring broad compatibility.
 
 ## Prerequisites
 
@@ -23,7 +23,7 @@ Glint is designed to be platform-agnostic but includes native optimizations for:
 *   **OpenCV (python-opencv)**: For image capture and processing.
 *   **brightnessctl**: For hardware-level brightness control (generic).
 *   **xrandr**: For software-level brightness control on X11 (fallback).
-*   **wl-gammarelay-rs**: Required for Hyprland/Wayland software brightness control.
+*   **hyprsunset**: Required for Hyprland/Wayland software brightness control. Must be running before starting Glint.
 *   **Webcam**: A functional video capture device.
 
 ## Installation

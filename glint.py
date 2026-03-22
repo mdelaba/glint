@@ -79,22 +79,19 @@ def run_glint(multiplier, offset):
             except Exception as e:
                 print(f"KDE PowerDevil control failed: {e}")
 
-        # Try Hyprland (via wl-gammarelay)
-        if os.environ.get("XDG_CURRENT_DESKTOP") == "Hyprland" and shutil.which("busctl"):
+        # Try Hyprland (via hyprsunset) - requires hyprsunset to already be running
+        if os.environ.get("XDG_CURRENT_DESKTOP") == "Hyprland" and shutil.which("hyprctl"):
             try:
-                target_val = final_percentage / 100.0
-                cmd_set = [
-                    "busctl", "--user", "set-property", 
-                    "rs.wl-gammarelay", 
-                    "/", 
-                    "rs.wl.gammarelay", 
-                    "Brightness", "d", str(target_val)
-                ]
-                subprocess.run(cmd_set, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                print(f"Set Hyprland brightness to {target_val} (via wl-gammarelay)")
-                brightness_set = True
+                # Check if hyprsunset is already running
+                check = subprocess.run(["pgrep", "-x", "hyprsunset"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                if check.returncode != 0:
+                    print("hyprsunset is not running. Please start it first.")
+                else:
+                    subprocess.run(["hyprctl", "hyprsunset", "gamma", str(final_percentage)], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    print(f"Set Hyprland brightness to {final_percentage}% (via hyprsunset)")
+                    brightness_set = True
             except Exception as e:
-                # If wl-gammarelay isn't running, we'll fall through to other methods
+                # If hyprsunset fails, we'll fall through to other methods
                 pass
 
         if not brightness_set:
